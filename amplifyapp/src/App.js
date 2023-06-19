@@ -1,13 +1,6 @@
 import logo from "./logo.svg";
 import "@aws-amplify/ui-react/styles.css";
-import {
-  withAuthenticator,
-  Button,
-  Heading,
-  Image,
-  View,
-  Card,
-} from "@aws-amplify/ui-react";
+import { withAuthenticator, Button, Heading, Image, View, Card } from "@aws-amplify/ui-react";
 import { useEffect, useRef, useState } from "react";
 import Amplify from "@aws-amplify/core";
 import { Storage } from "aws-amplify";
@@ -102,19 +95,20 @@ function App({ signOut }) {
           </tr>
         </thead>
         <tbody>
-          {files.map((file, i) => (
-            <tr key={file.key}>
-              <td>{i}</td>
-              <td>{file.key}</td>
-              <td>
-                <button onClick={() => handleShow(file.key)}>Show</button>
-                <button onClick={() => handleDelete(file.key)}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {Array.isArray(files) &&
+            files.map((file, i) => (
+              <tr key={file.key}>
+                <td>{i}</td>
+                <td>{file.key}</td>
+                <td>
+                  <button onClick={() => handleShow(file.key)}>Show</button>
+                  <button onClick={() => handleDelete(file.key)}>Delete</button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
-      <img src={image} width="600" />
+      <img src={image} width="600" alt="uploaded" />
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );
