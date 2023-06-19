@@ -13,7 +13,8 @@
     },
     "categories": {
       "auth": {
-        "amplifyappb0714d68b0714d68": {}
+        "amplifyappb0714d68b0714d68": {},
+        "userPoolGroups": {}
       }
     }
   }
