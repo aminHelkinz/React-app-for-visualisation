@@ -20,6 +20,10 @@ function App({ signOut }) {
 
   useEffect(() => {
     Amplify.configure({
+      Auth: {
+        identityPoolId: 'eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f', //REQUIRED - Amazon Cognito Identity Pool ID
+        region: 'eu-west-3', // REQUIRED - Amazon Cognito Region
+      },
       Storage: {
         AWSS3: {
           bucket: "amplifyapp6ba67f24072e4fc196fb52a34c0391ec135725-dev",
