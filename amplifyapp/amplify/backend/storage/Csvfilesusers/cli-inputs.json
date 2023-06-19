@@ -1,0 +1,13 @@
+{
+  "resourceName": "Csvfilesusers",
+  "policyUUID": "d5eb00c5",
+  "bucketName": "amplifyapp6ba67f24072e4fc196fb52a34c0391ec",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE"
+}

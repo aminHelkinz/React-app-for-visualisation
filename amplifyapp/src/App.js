@@ -1,34 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import '@aws-amplify/ui-react/styles.css';
-import { withAuthenticator, Button, Heading, Image, View, Card } from '@aws-amplify/ui-react';
-import { Auth } from 'aws-amplify';
-import { useUploadCsvToS3 } from './S3Upload';
+import logo from "./logo.svg";
+import "@aws-amplify/ui-react/styles.css";
+import {
+  withAuthenticator,
+  Button,
+  Heading,
+  Image,
+  View,
+  Card,
+} from "@aws-amplify/ui-react";
+import { useEffect, useRef, useState } from "react";
+import Amplify from "@aws-amplify/core";
+import { Storage } from "aws-amplify";
 
 function App({ signOut }) {
-  const [username, setUsername] = useState('');
-  const [csvFile, setCsvFile] = useState(null);
-  const [uploadDate, setUploadDate] = useState(null);
+  const ref = useRef(null);
+  const [files, setFiles] = useState([]);
+  const [image, setImage] = useState(null);
+  const [progress, setProgress] = useState();
 
   useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then((user) => {
-        setUsername(user.username);
-      })
-      .catch((error) => {
-        console.log('Erreur lors de la récupération de l\'utilisateur authentifié :', error);
-      });
+    Amplify.configure({
+      Storage: {
+        AWSS3: {
+          bucket: "amplifyapp6ba67f24072e4fc196fb52a34c0391ec135725-dev",
+          region: "eu-west-3",
+        },
+      },
+    });
   }, []);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setCsvFile(file);
-      setUploadDate(file.lastModified);
-    }
-  };
+  const loadFiles = () => {
+    Storage.list("")
+      .then((files) => {
+        console.log(files);
+        setFiles(files);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
-  useUploadCsvToS3(username, csvFile, uploadDate);
+  useEffect(() => {
+    loadFiles();
+  }, []);
+
+  const handleFileLoad = () => {
+    const file = ref.current.files[0];
+    const fileName = `user_${getCurrentDateInSeconds()}.csv`; // Renommer le fichier avec le nom d'utilisateur et la date en secondes
+    const folderName = `output/${getCurrentDateInSeconds()}`; // Nom du dossier de sortie avec la date en secondes
+
+    Storage.put(`${folderName}/${fileName}`, file, {
+      progressCallback: (progress) => {
+        setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
+        setTimeout(() => { setProgress() }, 1000);
+      }
+    })
+      .then(resp => {
+        console.log(resp);
+        loadFiles();
+      }).catch(err => { console.log(err); });
+  }
+
+  const handleShow = (file) => {
+    Storage.get(file).then(resp => {
+      console.log(resp);
+      setImage(resp)
+    }).catch(err => { console.log(err); });
+  }
+
+  const handleDelete = (file) => {
+    Storage.remove(file).then(resp => {
+      console.log(resp);
+      loadFiles();
+    }).catch(err => { console.log(err); });
+  }
+
+  const getCurrentDateInSeconds = () => {
+    const currentDate = new Date();
+    const timestamp = Math.floor(currentDate.getTime() / 1000); // Convertir la date en secondes
+    return timestamp.toString();
+  }
 
   return (
     <View className="App">
@@ -36,7 +87,30 @@ function App({ signOut }) {
         <Image src={logo} className="App-logo" alt="logo" />
         <Heading level={1}>We now have Auth!</Heading>
       </Card>
-      <input type="file" onChange={handleFileChange} />
+      <input ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
+      {progress}
+      <table>
+        <thead>
+          <tr>
+            <td></td>
+            <td>Name</td>
+            <td>Action</td>
+          </tr>
+        </thead>
+        <tbody>
+          {files.map((file, i) => (
+            <tr key={file.key}>
+              <td>{i}</td>
+              <td>{file.key}</td>
+              <td>
+                <button onClick={() => handleShow(file.key)}>Show</button>
+                <button onClick={() => handleDelete(file.key)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <img src={image} width="600" />
       <Button onClick={signOut}>Sign Out</Button>
     </View>
   );
