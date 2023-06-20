@@ -1,9 +1,8 @@
-import logo from "./logo.svg";
 import "@aws-amplify/ui-react/styles.css";
 import { withAuthenticator, Button, Heading, Image, View, Card } from "@aws-amplify/ui-react";
 import { useEffect, useRef, useState } from "react";
-import Amplify from "@aws-amplify/core";
-import { Storage } from "aws-amplify";
+import { Amplify, Storage } from "aws-amplify";
+import { Auth } from "@aws-amplify/auth";
 
 function App({ signOut }) {
   const ref = useRef(null);
@@ -41,21 +40,29 @@ function App({ signOut }) {
     loadFiles();
   }, []);
 
-  const handleFileLoad = () => {
+  const handleFileLoad = async () => {
     const file = ref.current.files[0];
-    const fileName = `user_${getCurrentDateInSeconds()}.csv`; // Renommer le fichier avec le nom d'utilisateur et la date en secondes
-    const folderName = `output/${getCurrentDateInSeconds()}`; // Nom du dossier de sortie avec la date en secondes
+    const currentDate = new Date();
+    const timestamp = Math.floor(currentDate.getTime() / 1000);
 
-    Storage.put(`${folderName}/${fileName}`, file, {
-      progressCallback: (progress) => {
-        setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-        setTimeout(() => { setProgress() }, 1000);
-      }
-    })
-      .then(resp => {
-        console.log(resp);
-        loadFiles();
-      }).catch(err => { console.log(err); });
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const authenticatedUser = user.username.toLowerCase();
+      const fileName = `${authenticatedUser}_${timestamp}.csv`;
+
+      Storage.put(fileName, file, {
+        progressCallback: (progress) => {
+          setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
+          setTimeout(() => { setProgress() }, 1000);
+        }
+      })
+        .then(resp => {
+          console.log(resp);
+          loadFiles();
+        }).catch(err => { console.log(err); });
+    } catch (error) {
+      console.log("Error getting authenticated user:", error);
+    }
   }
 
   const handleShow = (file) => {
@@ -72,28 +79,18 @@ function App({ signOut }) {
     }).catch(err => { console.log(err); });
   }
 
-  const getCurrentDateInSeconds = () => {
-    const currentDate = new Date();
-    const timestamp = Math.floor(currentDate.getTime() / 1000); // Convertir la date en secondes
-    return timestamp.toString();
-  }
-
   return (
     <View className="App">
       <Card>
-        <Image src={logo} className="App-logo" alt="logo" />
+        
         <Heading level={1}>We now have Auth!</Heading>
       </Card>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+        <Button onClick={signOut}>Sign Out</Button>
+      </div>
       <input ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
       {progress}
       <table>
-        <thead>
-          <tr>
-            <td></td>
-            <td>Name</td>
-            <td>Action</td>
-          </tr>
-        </thead>
         <tbody>
           {Array.isArray(files) &&
             files.map((file, i) => (
@@ -101,15 +98,14 @@ function App({ signOut }) {
                 <td>{i}</td>
                 <td>{file.key}</td>
                 <td>
-                  <button onClick={() => handleShow(file.key)}>Show</button>
-                  <button onClick={() => handleDelete(file.key)}>Delete</button>
+                  <Button onClick={() => handleShow(file.key)}>Show</Button>
+                  <Button onClick={() => handleDelete(file.key)}>Delete</Button>
                 </td>
               </tr>
             ))}
         </tbody>
       </table>
-      <img src={image} width="600" alt="uploaded" />
-      <Button onClick={signOut}>Sign Out</Button>
+      {image && <Image src={image} alt="File" />}
     </View>
   );
 }
