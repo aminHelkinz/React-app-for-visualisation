@@ -45,23 +45,23 @@ function App({ signOut }) {
     const file = ref.current.files[0];
     const currentDate = new Date();
     const timestamp = Math.floor(currentDate.getTime() / 1000);
-
+  
     if (selectedFile) {
       console.log("A file is already selected. Please upload one file at a time.");
       return;
     }
-
+  
     try {
       const user = await Auth.currentAuthenticatedUser();
+      const userEmail = user.attributes.email;
       const lastAtSymbolIndex = userEmail.lastIndexOf("@");
       const truncatedEmail = userEmail.substring(0, lastAtSymbolIndex);
-
+  
       const authenticatedUser = user.username.toLowerCase();
-      const userEmail = user.attributes.email;
       const fileName = `${authenticatedUser}_${truncatedEmail}_${timestamp}.csv`;
-
+  
       setSelectedFile(file);
-
+  
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
@@ -77,6 +77,7 @@ function App({ signOut }) {
       console.log("Error getting authenticated user:", error);
     }
   }
+  
 
   const handleShow = (file) => {
     Storage.get(file).then(resp => {
