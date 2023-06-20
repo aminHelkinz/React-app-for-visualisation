@@ -9,6 +9,7 @@ function App({ signOut }) {
   const [files, setFiles] = useState([]);
   const [image, setImage] = useState(null);
   const [progress, setProgress] = useState();
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     Amplify.configure({
@@ -45,10 +46,17 @@ function App({ signOut }) {
     const currentDate = new Date();
     const timestamp = Math.floor(currentDate.getTime() / 1000);
 
+    if (selectedFile) {
+      console.log("A file is already selected. Please upload one file at a time.");
+      return;
+    }
+
     try {
       const user = await Auth.currentAuthenticatedUser();
       const authenticatedUser = user.username.toLowerCase();
       const fileName = `${authenticatedUser}_${timestamp}.csv`;
+
+      setSelectedFile(file);
 
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
@@ -59,7 +67,8 @@ function App({ signOut }) {
         .then(resp => {
           console.log(resp);
           loadFiles();
-        }).catch(err => { console.log(err); });
+          setSelectedFile(null);
+        }).catch(err => { console.log(err); setSelectedFile(null); });
     } catch (error) {
       console.log("Error getting authenticated user:", error);
     }
@@ -82,7 +91,6 @@ function App({ signOut }) {
   return (
     <View className="App">
       <Card>
-        
         <Heading level={1}>We now have Auth!</Heading>
       </Card>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
