@@ -65,25 +65,18 @@ function App({ signOut }) {
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-          setTimeout(() => {
-            setProgress();
-          }, 1000);
-        },
+          setTimeout(() => { setProgress() }, 1000);
+        }
       })
-        .then((resp) => {
+        .then(resp => {
           console.log(resp);
-          loadFiles(); // Charger la liste des fichiers après le téléchargement réussi
+          loadFiles();
           setSelectedFile(null);
-        })
-        .catch((err) => {
-          console.log(err);
-          setSelectedFile(null);
-        });
+        }).catch(err => { console.log(err); setSelectedFile(null); });
     } catch (error) {
       console.log("Error getting authenticated user:", error);
     }
-  };
-  
+  }
   
 
   const handleShow = (file) => {
@@ -101,9 +94,9 @@ function App({ signOut }) {
   }
 
   return (
-    <View className="App" style={{ backgroundColor: "#333333" }}>
+    <View className="App">
       <Card>
-        <Heading level={1} style={{ color: "#00bfff" }}> Welcome dear customer!</Heading>
+        <Heading level={1} style={{ color: "#00bfff" }}> Welcome Dear customer!</Heading>
       </Card>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
         <Button onClick={signOut}>Sign Out</Button>
