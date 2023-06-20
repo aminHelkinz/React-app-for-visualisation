@@ -63,27 +63,17 @@ function App({ signOut }) {
 
       setSelectedFile(file);
 
-      Storage.put(fileName, file, {
+      const response = await Storage.put(fileName, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-          setTimeout(() => {
-            setProgress();
-          }, 1000);
         },
-        customPrefix: { public: '' },
-        metadata: {},
         level: "public",
         contentType: "text/csv",
-      })
-        .then((resp) => {
-          console.log(resp);
-          loadFiles();
-          setSelectedFile(null);
-        })
-        .catch((err) => {
-          console.log(err);
-          setSelectedFile(null);
-        });
+      });
+
+      console.log("File uploaded:", response);
+      loadFiles();
+      setSelectedFile(null);
     } catch (error) {
       console.log("Error getting authenticated user:", error);
     }
