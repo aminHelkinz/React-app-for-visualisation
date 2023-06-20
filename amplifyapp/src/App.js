@@ -62,7 +62,7 @@ function App({ signOut }) {
   
       setSelectedFile(file);
   
-      Storage.put(`/${fileName}`, file, {
+      Storage.put(${fileName}, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
           setTimeout(() => { setProgress() }, 1000);
