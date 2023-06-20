@@ -3,6 +3,7 @@ import { withAuthenticator, Button, Heading, Image, View, Card } from "@aws-ampl
 import { useEffect, useRef, useState } from "react";
 import { Amplify, Storage } from "aws-amplify";
 import { Auth } from "@aws-amplify/auth";
+import { Storage } from 'aws-amplify';
 
 function App({ signOut }) {
   const ref = useRef(null);
