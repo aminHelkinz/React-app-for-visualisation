@@ -70,6 +70,7 @@ function App({ signOut }) {
             setProgress();
           }, 1000);
         },
+        customPrefix: { public: '' },
         metadata: {},
         level: "public",
         contentType: "text/csv",
@@ -114,7 +115,6 @@ function App({ signOut }) {
     <View className="App">
       <Card>
         <Heading level={1} style={{ color: "#00bfff" }}>
-          {" "}
           Welcome Dear customer!
         </Heading>
       </Card>
