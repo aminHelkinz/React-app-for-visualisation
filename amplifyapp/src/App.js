@@ -67,9 +67,10 @@ function App({ signOut }) {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
           setTimeout(() => { setProgress() }, 1000);
         },
-        level: 'public',
-        key: fileName
+        customPrefix: { public: '' },
+        metadata: { '': '' }
       })
+      
       
       
         .then(resp => {
