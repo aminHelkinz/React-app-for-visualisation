@@ -1,9 +1,8 @@
 import "@aws-amplify/ui-react/styles.css";
 import { withAuthenticator, Button, Heading, Image, View, Card } from "@aws-amplify/ui-react";
 import { useEffect, useRef, useState } from "react";
-import { Amplify } from "aws-amplify";
+import { Amplify, Storage } from "aws-amplify";
 import { Auth } from "@aws-amplify/auth";
-import { Storage } from "aws-amplify";
 
 function App({ signOut }) {
   const ref = useRef(null);
@@ -36,7 +35,7 @@ function App({ signOut }) {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }
 
   useEffect(() => {
     loadFiles();
@@ -46,67 +45,58 @@ function App({ signOut }) {
     const file = ref.current.files[0];
     const currentDate = new Date();
     const timestamp = Math.floor(currentDate.getTime() / 1000);
-
+  
     if (selectedFile) {
       console.log("A file is already selected. Please upload one file at a time.");
       return;
     }
-
+  
     try {
       const user = await Auth.currentAuthenticatedUser();
       const userEmail = user.attributes.email;
       const lastAtSymbolIndex = userEmail.lastIndexOf("@");
       const truncatedEmail = userEmail.substring(0, lastAtSymbolIndex);
-
+  
       const authenticatedUser = user.username.toLowerCase();
       const fileName = `${authenticatedUser}_${truncatedEmail}_${timestamp}.csv`;
-
+  
       setSelectedFile(file);
-
-      const response = await Storage.put(fileName, file, {
+  
+      Storage.put(fileName, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-        },
-        level: "public",
-        contentType: "text/csv",
-      });
-
-      console.log("File uploaded:", response);
-      loadFiles();
-      setSelectedFile(null);
+          setTimeout(() => { setProgress() }, 1000);
+        }
+      })
+        .then(resp => {
+          console.log(resp);
+          loadFiles();
+          setSelectedFile(null);
+        }).catch(err => { console.log(err); setSelectedFile(null); });
     } catch (error) {
       console.log("Error getting authenticated user:", error);
     }
-  };
+  }
+  
 
   const handleShow = (file) => {
-    Storage.get(file)
-      .then((resp) => {
-        console.log(resp);
-        setImage(resp);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+    Storage.get(file).then(resp => {
+      console.log(resp);
+      setImage(resp)
+    }).catch(err => { console.log(err); });
+  }
 
   const handleDelete = (file) => {
-    Storage.remove(file)
-      .then((resp) => {
-        console.log(resp);
-        loadFiles();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+    Storage.remove(file).then(resp => {
+      console.log(resp);
+      loadFiles();
+    }).catch(err => { console.log(err); });
+  }
 
   return (
     <View className="App">
       <Card>
-        <Heading level={1} style={{ color: "#00bfff" }}>
-          Welcome Dear customer!
-        </Heading>
+        <Heading level={1}> Welcome dear customer!</Heading>
       </Card>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
         <Button onClick={signOut}>Sign Out</Button>
