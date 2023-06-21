@@ -27,7 +27,7 @@ function App({ signOut }) {
   }, []);
 
   const loadFiles = () => {
-    Storage.list("")
+    Storage.list("", { pageSize: 1000 })
       .then((files) => {
         console.log(files);
         setFiles(files);
