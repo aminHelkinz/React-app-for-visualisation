@@ -104,7 +104,7 @@ function App({ signOut }) {
         <tbody>
           {Array.isArray(files) &&
             files.map((file, i) => (
-              <tr key={file.key}>
+              <tr key={file.key + i}> {/* Add a unique key */}
                 <td>{i}</td>
                 <td>{file.key}</td>
                 <td>
