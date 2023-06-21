@@ -8,7 +8,7 @@ function App({ signOut }) {
   const ref = useRef(null);
   const [files, setFiles] = useState([]);
   const [image, setImage] = useState(null);
-  const [progress, setProgress] = useState();
+  const [progress, setProgress] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
@@ -46,8 +46,8 @@ function App({ signOut }) {
     const currentDate = new Date();
     const timestamp = Math.floor(currentDate.getTime() / 1000);
   
-    if (selectedFile) {
-      console.log("A file is already selected. Please upload one file at a time.");
+    if (!file || file.size === 0) {
+      console.log("Please select a non-empty file.");
       return;
     }
   
@@ -61,8 +61,10 @@ function App({ signOut }) {
   
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
-          setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-          setTimeout(() => { setProgress() }, 1000);
+          setProgress((prevProgress) => ({
+            ...prevProgress,
+            [fileName]: Math.round((progress.loaded / progress.total) * 100)
+          }));
         }
       })
         .then(resp => {
@@ -99,7 +101,9 @@ function App({ signOut }) {
         <Button onClick={signOut}>Sign Out</Button>
       </div>
       <input ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
-      {progress}
+      {Object.keys(progress).map((fileName) => (
+        <div key={fileName}>{fileName}: {progress[fileName]}%</div>
+      ))}
       <table>
         <tbody>
           {Array.isArray(files) &&
