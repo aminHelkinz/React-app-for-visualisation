@@ -55,7 +55,7 @@ function App({ signOut }) {
       const user = await Auth.currentAuthenticatedUser();
       const userEmail = user.attributes.email;
       const authenticatedUser = user.username;
-      const fileName = `${authenticatedUser}_${timestamp}#${userEmail}.csv`;
+      const fileName = `${authenticatedUser}-${timestamp}#${userEmail}.csv`;
   
       setSelectedFile(file);
   
