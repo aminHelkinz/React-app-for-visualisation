@@ -8,26 +8,27 @@ function App({ signOut }) {
   const ref = useRef(null);
   const [files, setFiles] = useState([]);
   const [image, setImage] = useState(null);
-  const [progress, setProgress] = useState({});
+  const [progress, setProgress] = useState();
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     Amplify.configure({
       Auth: {
-        identityPoolId: 'eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f', // REQUIRED - Amazon Cognito Identity Pool ID
+        identityPoolId: 'eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f', //REQUIRED - Amazon Cognito Identity Pool ID
         region: 'eu-west-3', // REQUIRED - Amazon Cognito Region
       },
       Storage: {
         AWSS3: {
           bucket: "amplifyapp6ba67f24072e4fc196fb52a34c0391ec135725-dev",
           region: "eu-west-3",
+          pageSize: 1000
         },
       },
     });
   }, []);
 
   const loadFiles = () => {
-    Storage.list("", { pageSize: 1000 })
+    Storage.list("")
       .then((files) => {
         console.log(files);
         setFiles(files);
@@ -50,6 +51,10 @@ function App({ signOut }) {
       console.log("A file is already selected. Please upload one file at a time.");
       return;
     }
+        if (!file || file.size === 0) {
+      console.log("Please select a non-empty file. ", fileName);
+      return;
+    }
   
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -61,10 +66,8 @@ function App({ signOut }) {
   
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
-          setProgress((prevProgress) => ({
-            ...prevProgress,
-            [fileName]: Math.round((progress.loaded / progress.total) * 100)
-          }));
+          setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
+          setTimeout(() => { setProgress() }, 1000);
         }
       })
         .then(resp => {
@@ -101,9 +104,7 @@ function App({ signOut }) {
         <Button onClick={signOut}>Sign Out</Button>
       </div>
       <input ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
-      {Object.entries(progress).map(([key, value]) => (
-        <div key={key}>{`${key}: ${value}%`}</div>
-      ))}
+      {progress}
       <table>
         <tbody>
           {Array.isArray(files) &&
