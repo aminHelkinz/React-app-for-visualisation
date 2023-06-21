@@ -14,7 +14,7 @@ function App({ signOut }) {
   useEffect(() => {
     Amplify.configure({
       Auth: {
-        identityPoolId: 'eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f', //REQUIRED - Amazon Cognito Identity Pool ID
+        identityPoolId: 'eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f', // REQUIRED - Amazon Cognito Identity Pool ID
         region: 'eu-west-3', // REQUIRED - Amazon Cognito Region
       },
       Storage: {
@@ -46,8 +46,8 @@ function App({ signOut }) {
     const currentDate = new Date();
     const timestamp = Math.floor(currentDate.getTime() / 1000);
   
-    if (!file || file.size === 0) {
-      console.log("Please select a non-empty file.");
+    if (selectedFile) {
+      console.log("A file is already selected. Please upload one file at a time.");
       return;
     }
   
@@ -101,8 +101,8 @@ function App({ signOut }) {
         <Button onClick={signOut}>Sign Out</Button>
       </div>
       <input ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
-      {Object.keys(progress).map((fileName) => (
-        <div key={fileName}>{fileName}: {progress[fileName]}%</div>
+      {Object.entries(progress).map(([key, value]) => (
+        <div key={key}>{`${key}: ${value}%`}</div>
       ))}
       <table>
         <tbody>
