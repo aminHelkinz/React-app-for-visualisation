@@ -22,10 +22,6 @@ function App({ signOut }) {
         AWSS3: {
           bucket: "amplifyapp6ba67f24072e4fc196fb52a34c0391ec135725-dev",
           region: "eu-west-3"
-        },
-        AWSS3_2: {
-          bucket: 'output-sales-pred', // Bucket for visualization plots
-          region: 'eu-west-3',
         }
       }
     });

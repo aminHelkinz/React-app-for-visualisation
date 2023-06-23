@@ -14,10 +14,10 @@ function VisualizationLoadingPage({ onBackClick, onSignOutClick }) {
         const dateKey = Math.floor(currentDate.getTime() / 1000).toString();
         const plotKey = `${username}/${dateKey}/plot/`;
 
-        const plotFiles = await Storage.list(plotKey, { level: "public", customPrefix: { public: 'AWSS3_2' } });
+        const plotFiles = await Storage.list(plotKey, { level: "public", customPrefix: { public: 'AWSS3' } });
         if (Array.isArray(plotFiles) && plotFiles.length > 0) {
           const latestPlot = plotFiles[plotFiles.length - 1];
-          const plotURL = await Storage.get(latestPlot.key, { level: "public", customPrefix: { public: 'AWSS3_2' } });
+          const plotURL = await Storage.get(latestPlot.key, { level: "public", customPrefix: { public: 'AWSS3' } });
           setPlotImage(plotURL);
         }
       } catch (error) {
