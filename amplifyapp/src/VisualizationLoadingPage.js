@@ -3,30 +3,58 @@ import { Button, Image } from "@aws-amplify/ui-react";
 import { Storage, Auth } from "aws-amplify";
 
 function VisualizationLoadingPage({ onBackClick, onSignOutClick }) {
-  const [plotImage, setPlotImage] = useState(null);
+  const [usernameFolder, setUsernameFolder] = useState(null);
+  const [dateFolders, setDateFolders] = useState([]);
+  const [plotImages, setPlotImages] = useState([]);
 
   useEffect(() => {
-    const fetchLatestPlot = async () => {
+    const fetchUserFolder = async () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
         const username = user.username;
-        const currentDate = new Date();
-        const dateKey = Math.floor(currentDate.getTime() / 1000).toString();
-        const plotKey = `${username}/${dateKey}/plot/`;
+        const folders = await Storage.list("", { level: "private", customPrefix: { private: "AWSS3_2" } });
 
-        const plotFiles = await Storage.list(plotKey, { level: "private", customPrefix: { public: 'AWSS3_2' } });
-        if (Array.isArray(plotFiles) && plotFiles.length > 0) {
-          const latestPlot = plotFiles[plotFiles.length - 1];
-          const plotURL = await Storage.get(latestPlot.key, { level: "private", customPrefix: { public: 'AWSS3_2' } });
-          setPlotImage(plotURL);
-        }
+        const userFolder = folders.find((folder) => folder.key === username + "/");
+        setUsernameFolder(userFolder);
       } catch (error) {
-        console.log("Error fetching latest plot:", error);
+        console.log("Error fetching user folder:", error);
       }
     };
 
-    fetchLatestPlot();
+    fetchUserFolder();
   }, []);
+
+  const fetchDateFolders = async () => {
+    try {
+      const folders = await Storage.list(usernameFolder.key, { level: "private", customPrefix: { private: "AWSS3_2" } });
+
+      const dateFolders = folders.filter((folder) => folder.key.endsWith("/"));
+      setDateFolders(dateFolders);
+    } catch (error) {
+      console.log("Error fetching date folders:", error);
+    }
+  };
+
+  const handleUserFolderClick = async () => {
+    if (usernameFolder) {
+      fetchDateFolders();
+    }
+  };
+
+  const handleDateFolderClick = async (dateFolder) => {
+    try {
+      const plotFiles = await Storage.list(dateFolder.key + "plot/", { level: "private", customPrefix: { private: "AWSS3_2" } });
+      setPlotImages(plotFiles);
+    } catch (error) {
+      console.log("Error fetching plot images:", error);
+    }
+  };
+
+  const handlePlotImageClick = (plotImage) => {
+    const imageSrc = plotImage.key;
+    // Implement the logic to display the image in a modal or new page
+    console.log("Clicked on plot image:", imageSrc);
+  };
 
   return (
     <div>
@@ -35,7 +63,37 @@ function VisualizationLoadingPage({ onBackClick, onSignOutClick }) {
         <Button onClick={onBackClick}>Back</Button>
         <Button onClick={onSignOutClick}>Sign Out</Button>
       </div>
-      {plotImage && <Image src={plotImage} alt="Visualization Plot" />}
+
+      {!usernameFolder && (
+        <div>
+          <p>Loading user folder...</p>
+        </div>
+      )}
+
+      {usernameFolder && (
+        <div>
+          <h2>User Folder:</h2>
+          <Button onClick={handleUserFolderClick}>{usernameFolder.key}</Button>
+
+          <h2>Date Folders:</h2>
+          <ul>
+            {dateFolders.map((dateFolder) => (
+              <li key={dateFolder.key}>
+                <Button onClick={() => handleDateFolderClick(dateFolder)}>{dateFolder.key}</Button>
+              </li>
+            ))}
+          </ul>
+
+          <h2>Plot Images:</h2>
+          <ul>
+            {plotImages.map((plotImage) => (
+              <li key={plotImage.key}>
+                <Button onClick={() => handlePlotImageClick(plotImage)}>{plotImage.key}</Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
