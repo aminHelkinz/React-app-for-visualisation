@@ -1,4 +1,20 @@
 {
+  "api": {
+    "api8bf39c3e": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "amplifyapp5d93d58a"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
   "auth": {
     "amplifyappb0714d68b0714d68": {
       "customAuth": false,
@@ -23,22 +39,31 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
-    },
-    "userPoolGroups": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId",
-            "AppClientIDWeb",
-            "AppClientID",
-            "IdentityPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "amplifyappb0714d68b0714d68"
-        }
-      ],
+    }
+  },
+  "function": {
+    "amplifyapp5d93d58a": {
+      "build": true,
       "providerPlugin": "awscloudformation",
-      "service": "Cognito-UserPool-Groups"
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_amplifyapp5d93d58a_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "amplifyapp5d93d58a"
+        }
+      ]
+    },
+    "AMPLIFY_function_amplifyapp5d93d58a_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "amplifyapp5d93d58a"
+        }
+      ]
     }
   },
   "storage": {
