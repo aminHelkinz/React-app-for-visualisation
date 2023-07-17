@@ -135,19 +135,18 @@ function App({ signOut }) {
 //*************************************** Api Post image *********************************************//
 async function getImageFromBackend(folderName) {
   try {
+    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
 
     const requestData = {
       headers: {
-        token: `${(await Auth.currentSession())
-          .getIdToken()
-          .getJwtToken()}`
+        token1: token
       },
       body: {
         ObjectName: folderName,
       },
     };
 
-    const response = await API.get("api8bf39c3e", "/items", requestData);
+    const response = await API.post("api8bf39c3e", "/items", requestData);
   
     if (response.status === 200) {
       const imageUrl = await Storage.get(folderName);
