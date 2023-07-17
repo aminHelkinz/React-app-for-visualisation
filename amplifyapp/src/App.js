@@ -63,7 +63,7 @@ function App({ signOut }) {
       const user = await Auth.currentAuthenticatedUser();
       const userEmail = user.attributes.email;
       const authenticatedUser = user.username;
-      const uniqueKey = `${authenticatedUser}-${timestamp}-${file.name.replace(/\s/g, '')}`; // Generate a unique key for the file
+      const uniqueKey = `${authenticatedUser}-${timestamp}`; // Generate a unique key for the file
       const fileName = `${uniqueKey}#${userEmail}.csv`;
   
       setSelectedFile(file);
@@ -135,18 +135,19 @@ function App({ signOut }) {
 //*************************************** Api Post image *********************************************//
 async function getImageFromBackend(folderName) {
   try {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
 
     const requestData = {
       headers: {
-        token: token
+        token: `${(await Auth.currentSession())
+          .getIdToken()
+          .getJwtToken()}`
       },
       body: {
         ObjectName: folderName,
       },
     };
 
-    const response = await API.post("api8bf39c3e", "/items", requestData);
+    const response = await API.get("api8bf39c3e", "/items", requestData);
   
     if (response.status === 200) {
       const imageUrl = await Storage.get(folderName);
@@ -174,7 +175,7 @@ const handleFolderClick = (folderName) => {
 
   if (folderName.endsWith('.png')) {
     // Handle image object
-    const imagePath = `${updatedRoot}/${folderName}`;
+    const imagePath= `${updatedRoot}/${folderName}`;
     getImageFromBackend(imagePath);
   } else {
     // Handle folder
