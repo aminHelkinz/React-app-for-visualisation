@@ -13,20 +13,20 @@
       "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-amplifyapp-dev-135725-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
-      "auth": {
-        "amplifyappb0714d68b0714d68": {}
-      },
       "storage": {
         "Csvfilesusers": {}
       },
+      "auth": {
+        "amplifyappcc660851cc660851": {}
+      },
       "function": {
-        "amplifyapp5d93d58a": {
+        "amplifyappc91979ee": {
           "deploymentBucketName": "amplify-amplifyapp-dev-135725-deployment",
-          "s3Key": "amplify-builds/amplifyapp5d93d58a-646877766543646a4768-build.zip"
+          "s3Key": "amplify-builds/amplifyappc91979ee-3268654447544e457a63-build.zip"
         }
       },
       "api": {
-        "api8bf39c3e": {}
+        "api3a030801": {}
       }
     }
   }

@@ -1,6 +1,6 @@
 {
   "api": {
-    "api8bf39c3e": {
+    "api3a030801": {
       "dependsOn": [
         {
           "attributes": [
@@ -8,7 +8,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "amplifyapp5d93d58a"
+          "resourceName": "amplifyappc91979ee"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,7 +16,7 @@
     }
   },
   "auth": {
-    "amplifyappb0714d68b0714d68": {
+    "amplifyappcc660851cc660851": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -28,9 +28,7 @@
           "passwordPolicyCharacters": [],
           "passwordPolicyMinLength": 8
         },
-        "signupAttributes": [
-          "EMAIL"
-        ],
+        "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [],
         "verificationMechanisms": [
@@ -42,26 +40,26 @@
     }
   },
   "function": {
-    "amplifyapp5d93d58a": {
+    "amplifyappc91979ee": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
   "parameters": {
-    "AMPLIFY_function_amplifyapp5d93d58a_deploymentBucketName": {
+    "AMPLIFY_function_amplifyappc91979ee_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "amplifyapp5d93d58a"
+          "resourceName": "amplifyappc91979ee"
         }
       ]
     },
-    "AMPLIFY_function_amplifyapp5d93d58a_s3Key": {
+    "AMPLIFY_function_amplifyappc91979ee_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "amplifyapp5d93d58a"
+          "resourceName": "amplifyappc91979ee"
         }
       ]
     }

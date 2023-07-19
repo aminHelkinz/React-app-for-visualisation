@@ -11,7 +11,7 @@
     "env": {
       "Type": "String"
     },
-    "api8bf39c3e": {
+    "api3a030801": {
       "Type": "String"
     }
   },
@@ -52,7 +52,7 @@
                       },
                       ":",
                       {
-                        "Ref": "api8bf39c3e"
+                        "Ref": "api3a030801"
                       },
                       "/",
                       {
@@ -82,7 +82,7 @@
                       },
                       ":",
                       {
-                        "Ref": "api8bf39c3e"
+                        "Ref": "api3a030801"
                       },
                       "/",
                       {

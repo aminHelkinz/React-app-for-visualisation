@@ -3,7 +3,7 @@
   "paths": {
     "/items": {
       "name": "/items",
-      "lambdaFunction": "amplifyapp5d93d58a",
+      "lambdaFunction": "amplifyappc91979ee",
       "permissions": {
         "setting": "private",
         "auth": [

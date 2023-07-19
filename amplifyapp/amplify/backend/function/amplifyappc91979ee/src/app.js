@@ -11,9 +11,10 @@ See the License for the specific language governing permissions and limitations 
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 const AWS = require('aws-sdk');
 const s3Client = new AWS.S3();
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+
 // declare a new express app
 const app = express()
 app.use(bodyParser.json())
@@ -21,18 +22,16 @@ app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, token");
-  res.header("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
-  res.header("Access-Control-Expose-Headers", "Date, X-Amzn-ErrorType");
-  next();
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", "*")
+  next()
 });
-
 
 
 /**********************
  * Example get method *
  **********************/
+
 
 app.get('/items',async function(req, res) {
   const event = req.apiGateway.event
@@ -85,27 +84,7 @@ app.get('/items/get', async function(req, res) {
       res.send(data.Body);        // Send File Buffer
     }
   });
-
-
-
-  
-
-  
- 
 });
-
-
-/****************************
-* Example post method *
-****************************/
-
-// app.post('/items', function(req, res) {
-//   // Add your code here
-
-//   res.json({success: 'get call succeed!', body: req.body});
-// });
-
-
 
 app.listen(3000, function() {
     console.log("App started")
