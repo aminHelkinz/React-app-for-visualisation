@@ -14,7 +14,6 @@ const bodyParser = require('body-parser')
 const AWS = require('aws-sdk');
 const s3Client = new AWS.S3();
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
-
 // declare a new express app
 const app = express()
 app.use(bodyParser.json())
@@ -22,10 +21,13 @@ app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "*")
-  next()
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, token");
+  res.header("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT");
+  res.header("Access-Control-Expose-Headers", "Date, X-Amzn-ErrorType");
+  next();
 });
+
 
 
 /**********************
@@ -61,37 +63,41 @@ app.get('/items',async function(req, res) {
   
 });
 
+
+app.get('/items/get', async function(req, res) {
+  const event = req.apiGateway.event;
+  const authenticatedUser = event.requestContext.authorizer.claims['cognito:username'];
+  var Prefix= event.queryStringParameters.Prefix;
+  var params = { 
+    Bucket: 'output-sales-pred',
+    Key: `${authenticatedUser}/${Prefix}` 
+  };
+
+  s3Client.getObject(params, function (err, data) {
+    if (err) {
+      res.status(500);
+      res.end(`Error Fetching File : ${params.Key} --> `+err.toString());
+    }
+    else {
+      res.set({'Content-Type': 'image/png'});
+      res.attachment(params.Key); // Set Filename
+      console.log(data.Body)
+      res.send(data.Body);        // Send File Buffer
+    }
+  });
+
+
+
+  
+
+  
+ 
+});
+
+
 /****************************
 * Example post method *
 ****************************/
-app.post('/items', async function(req, res) {
-  try {
-    const event = req.apiGateway.event;
-    const authenticatedUser = event.requestContext.authorizer.claims['cognito:username'];
-
-    const { ObjectName } = req.body;
-    const Key = `${authenticatedUser}/${ObjectName}`;
-
-    const params = {
-      Bucket: 'output-sales-pred',
-      Key: Key,
-    };
-
-    const response = await s3Client.getObject(params).promise();
-    const image = response.Body;
-
-    // Set the appropriate headers for the image response
-    res.set({
-      'Content-Type': 'image/png', // Adjust the content type according to your image type
-      'Content-Length': response.ContentLength.toString(),
-    });
-
-    res.send(image);
-  } catch (error) {
-    // Return an error response if any exception occurs
-    res.status(500).json(error.toString());
-  }
-});
 
 // app.post('/items', function(req, res) {
 //   // Add your code here

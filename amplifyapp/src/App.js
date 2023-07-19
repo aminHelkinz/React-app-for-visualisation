@@ -5,10 +5,10 @@ import {
   withAuthenticator,
   Button,
   Heading,
-  Image,
   View,
-  Card,
+  Card
 } from "@aws-amplify/ui-react";
+
 
 function App({ signOut }) {
   const ref = useRef(null);
@@ -20,11 +20,12 @@ function App({ signOut }) {
   const [showVisualizationLoadingPage, setShowVisualizationLoadingPage] = useState(false);
   const [apiData, setApiData] = useState([]);
   const [root, setRoot] = useState("");
+ //************************************** Amplify configuration Part**********************************************//
   useEffect(() => {
     Amplify.configure({
       Auth: {
-        identityPoolId: "eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f", // REQUIRED - Amazon Cognito Identity Pool ID
-        region: "eu-west-3", // REQUIRED - Amazon Cognito Region
+        identityPoolId: "eu-west-3:5c0822cb-cf4a-4b2f-a235-3ddeefb0b41f",
+        region: "eu-west-3",
       },
       Storage: {
         AWSS3: {
@@ -36,8 +37,7 @@ function App({ signOut }) {
     callApi("");
     loadFiles();
   }, []);
-
-  //************************************** Upload Files Part**********************************************//
+ //************************************** Upload Files Part**********************************************//
   const loadFiles = () => {
     Storage.list(root)
       .then((files) => {
@@ -51,38 +51,32 @@ function App({ signOut }) {
 
   const handleFileLoad = async () => {
     const file = ref.current.files[0];
-    const currentDate = new Date();
-    const timestamp = Math.floor(currentDate.getTime() / 1000);
-  
+
     if (selectedFile) {
       console.log("A file is already selected. Please upload one file at a time.");
       return;
     }
-  
+
     try {
       const user = await Auth.currentAuthenticatedUser();
       const userEmail = user.attributes.email;
       const authenticatedUser = user.username;
-      const uniqueKey = `${authenticatedUser}-${timestamp}`; // Generate a unique key for the file
+      const uniqueKey = `${authenticatedUser}-${Date.now()}`;
       const fileName = `${uniqueKey}#${userEmail}.csv`;
-  
+
       setSelectedFile(file);
-  
+
       Storage.put(fileName, file, {
         progressCallback: (progress) => {
           setProgress(Math.round((progress.loaded / progress.total) * 100) + "%");
-          setTimeout(() => {
-            setProgress();
-          }, 1000);
         },
       })
         .then((resp) => {
           console.log(resp);
           setSelectedFile(null);
-          setShowVisualizationLoadingPage(false); // Go back to the main page
-          loadFiles(); // Load the files after successful upload
-  
-          // Clear the file input field
+          setShowVisualizationLoadingPage(false);
+          loadFiles();
+
           setFileInputKey(Date.now().toString());
         })
         .catch((err) => {
@@ -95,125 +89,119 @@ function App({ signOut }) {
   };
 
   //************************************** API Get Prefix **********************************************//
-
-
   async function callApi(folderName) {
     try {
       const requestData = {
         headers: {
           token: `${(await Auth.currentSession())
             .getIdToken()
-            .getJwtToken()}`
+            .getJwtToken()}`,
         },
         queryStringParameters: {
           Prefix: folderName,
         },
-      }; 
-      const {response} = await API.get("api8bf39c3e", "/items", requestData);
-      
-      let data = []
-      console.log(response.CommonPrefixes.length)
-      if(response.CommonPrefixes.length!=0){
-        data = response.CommonPrefixes.map(i => {return {name:i.Prefix.split('/').filter(i=>i).pop()}})
-        setApiData(data);
+      };
 
-      }else{
-        console.log(response)
-        data = response.Contents.map(i => {return {key:i.Key,name:i.Key.split('/').filter(i=>i&& i).pop()}})
-        data.shift()
-        console.log(data)
+      const { response } = await API.get("api8bf39c3e", "/items", requestData);
+
+      let data = [];
+      if (response.CommonPrefixes.length !== 0) {
+        data = response.CommonPrefixes.map((i) => {
+          return { name: i.Prefix.split("/").filter((i) => i).pop() };
+        });
+        setApiData(data);
+      } else {
+        data = response.Contents.map((i) => {
+          return { key: i.Key, name: i.Key.split("/").filter((i) => i && i).pop() };
+        });
+        data.shift();
         setApiData(data);
       }
-   
-     
-     
-      
     } catch (error) {
       console.log("Error calling API:", error);
     }
   }
-//*************************************** Api Post image *********************************************//
-async function getImageFromBackend(folderName) {
+//**************************************API Get image **********************************************//
+async function getImageFromBackend(objectName) {
   try {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
-
     const requestData = {
       headers: {
-        token1: token
+        token: `${(await Auth.currentSession())
+          .getIdToken()
+          .getJwtToken()}`,
       },
-      body: {
-        ObjectName: folderName,
+      queryStringParameters: {
+        Prefix: objectName,
       },
     };
 
-    const response = await API.post("api8bf39c3e", "/items", requestData);
+    const response = await API.get("api8bf39c3e", `/items/get/`, requestData);
+    console.log("-----", response, "-----");
+
+    const blob = await response.blob();
+    console.log(blob);
+
+    if (blob) {
   
-    if (response.status === 200) {
-      const imageUrl = await Storage.get(folderName);
+      const imageUrl = await blobToDataURL(blob);
       setImage(imageUrl);
     } else {
       setImage(null);
     }
   } catch (error) {
     console.log("Error calling API:", error);
-    if (error.response && error.response.status === 500 && error.response.data === 'NoSuchKey: The specified key does not exist') {
+    if (
+      error.response &&
+      error.response.status === 500 &&
+      error.response.data === "NoSuchKey: The specified key does not exist"
+    ) {
       setImage(null);
     }
   }
 }
 
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 
-
-  
 
 //*************************************** Api function to click in folders *********************************************//
-const handleFolderClick = (folderName) => {
-  console.log(folderName);
-  const updatedRoot = root !== "" ? `${root}/${folderName}` : folderName;
-  console.log(updatedRoot);
+  const handleFolderClick = (folderName) => {
+    console.log(folderName);
+    const updatedRoot = root !== "" ? `${root}/${folderName}` : folderName;
+    console.log(updatedRoot);
 
-  if (folderName.endsWith('.png')) {
-    // Handle image object
-    const imagePath= `${updatedRoot}/${folderName}`;
-    getImageFromBackend(imagePath);
-  } else {
-    // Handle folder
-    setRoot(updatedRoot);
-    callApi(updatedRoot);
-  }
-};
-
-  // const handleFolderClick = (folderName) => {
-  //   console.log(folderName)
-  //   const updatedRoot = root !== "" ? `${root}/${folderName}` : folderName;
-  //   console.log(updatedRoot)
-  //   if(folderName.endsWith('.png')){
-
-  //   }else{
-  //   setRoot(updatedRoot);
-  //   callApi(updatedRoot);
-  //   }
-  //   // loadFiles();
-  // };  
-
+    if (folderName.endsWith(".png")) {
+      getImageFromBackend(updatedRoot);
+    } else {
+      setRoot(updatedRoot);
+      callApi(updatedRoot);
+    }
+  };
 //************************************** main **********************************************//
-
   return (
     <View className="App">
-        <>
-          <Card>
-            <Heading level={1}>Welcome, dear customer!</Heading>
-          </Card>
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-            <Button onClick={() => setShowVisualizationLoadingPage(true)}>Switch to Visualization Loading Page</Button>
-            <Button onClick={signOut}>Sign Out</Button>
-          </div>
-          <input key={fileInputKey} ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
-          {progress}
+      <>
+        <Card>
+          <Heading level={1}>Welcome, dear customer!</Heading>
+        </Card>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
+          <Button onClick={() => setShowVisualizationLoadingPage(true)}>Switch to Visualization Loading Page</Button>
+          <Button onClick={signOut}>Sign Out</Button>
+        </div>
+        <input key={fileInputKey} ref={ref} type="file" accept=".csv" onChange={handleFileLoad} />
+        {progress}
+        
+        
+        {image && <img src={image} alt="File" />}
 
-          {image && <Image src={image} alt="File" />}
-        </>
-        <table>
+      </>
+      <table>
         <tbody>
           {Array.isArray(apiData) &&
             apiData.map((folder) => (
@@ -223,14 +211,13 @@ const handleFolderClick = (folderName) => {
                     {folder.name}
                   </a>
                 </td>
-                <td>
-                  {folder.image && <Image src={folder.image} alt="Image" />}
+                <td> 
                 </td>
+                
               </tr>
             ))}
         </tbody>
       </table>
-
     </View>
   );
 }
