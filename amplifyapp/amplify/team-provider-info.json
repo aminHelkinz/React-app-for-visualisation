@@ -22,7 +22,7 @@
       "function": {
         "amplifyappc91979ee": {
           "deploymentBucketName": "amplify-amplifyapp-dev-135725-deployment",
-          "s3Key": "amplify-builds/amplifyappc91979ee-556f7a5a674e45466477-build.zip"
+          "s3Key": "amplify-builds/amplifyappc91979ee-3268654447544e457a63-build.zip"
         }
       },
       "api": {
