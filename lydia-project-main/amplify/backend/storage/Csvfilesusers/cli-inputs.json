@@ -1,0 +1,14 @@
+{
+  "resourceName": "Csvfilesusers",
+  "policyUUID": "72a77735",
+  "bucketName": "reactamplifiedb9c8b6db11b749539fb7102c3441c5b7",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

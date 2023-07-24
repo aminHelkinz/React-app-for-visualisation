@@ -1,0 +1,7 @@
+{
+  "dev": {
+    "configLevel": "project",
+    "useProfile": false,
+    "awsConfigFilePath": "/Users/AREZKI/.amplify/awscloudformation/WSD1FB4s4C"
+  }
+}

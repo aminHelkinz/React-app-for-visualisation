@@ -1,0 +1,73 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-reactamplified-dev-161538-authRole",
+      "UnauthRoleArn": "arn:aws:iam::086892845792:role/amplify-reactamplified-dev-161538-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::086892845792:role/amplify-reactamplified-dev-161538-authRole",
+      "Region": "eu-west-3",
+      "DeploymentBucketName": "amplify-reactamplified-dev-161538-deployment",
+      "UnauthRoleName": "amplify-reactamplified-dev-161538-unauthRole",
+      "StackName": "amplify-reactamplified-dev-161538",
+      "StackId": "arn:aws:cloudformation:eu-west-3:086892845792:stack/amplify-reactamplified-dev-161538/e74d9620-2707-11ee-b805-0e031d32fafa",
+      "AmplifyAppId": "d3hjzrtqhm8bv4"
+    }
+  },
+  "auth": {
+    "reactamplified5592668255926682": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "frontendAuthConfig": {
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-reactamplified-dev-161538-deployment/amplify-cfn-templates/auth/reactamplified5592668255926682-cloudformation-template.json",
+        "logicalId": "authreactamplified5592668255926682"
+      },
+      "lastPushTimeStamp": "2023-07-20T15:17:00.491Z",
+      "output": {
+        "UserPoolId": "eu-west-3_cNyOylGaS",
+        "AppClientIDWeb": "7ukr80tt6h1v0tju9c6ki7roe8",
+        "AppClientID": "4tbt0q6aclafd2qptb8dbbvsk",
+        "IdentityPoolId": "eu-west-3:094352be-af71-42b3-867c-0dcdaed91105",
+        "UserPoolArn": "arn:aws:cognito-idp:eu-west-3:086892845792:userpool/eu-west-3_cNyOylGaS",
+        "IdentityPoolName": "reactamplified55926682_identitypool_55926682__dev",
+        "UserPoolName": "reactamplified55926682_userpool_55926682"
+      },
+      "lastPushDirHash": "bn+wJkdBqKoOOBb9zXCPdUwmhug="
+    }
+  },
+  "storage": {
+    "Csvfilesusers": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "lastPushTimeStamp": "2023-07-20T15:17:00.684Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-reactamplified-dev-161538-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
+        "logicalId": "storageCsvfilesusers"
+      },
+      "output": {
+        "BucketName": "reactamplifiedb9c8b6db11b749539fb7102c3441c5b7161538-dev",
+        "Region": "eu-west-3"
+      },
+      "lastPushDirHash": "v2Z7bSo3Rrh1seKsnlnSg7GZLL0="
+    }
+  }
+}
